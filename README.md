@@ -1,1 +1,1 @@
-These are the instructions for setting Raspberry Pi to open an ssh shel in your browswer tabs. There is no login with this method once complete so if you're Pi is on your own privat network everythign will be fine.
+These are the instructions for setting Raspberry Pi to open an ssh shell in your browswer tabs. There is no login with this method once complete so if you're Pi is on your own privat network everythign will be fine.

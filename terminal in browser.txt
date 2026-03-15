@@ -1,0 +1,142 @@
+SSH into the device as <user>.
+
+Run:
+
+cd /home/<user>
+uname -m
+
+Download the correct ttyd binary for your CPU.
+
+For 64-bit ARM (aarch64):
+
+wget https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.aarch64
+mv ttyd.aarch64 ttyd
+
+For 32-bit ARM (armv7l or similar):
+
+wget https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.armhf
+mv ttyd.armhf ttyd
+
+For x86_64:
+
+wget https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64
+mv ttyd.x86_64 ttyd
+
+Make it executable:
+
+chmod +x ttyd
+
+Move it into a system path:
+
+sudo mv ttyd /usr/local/bin/ttyd
+
+Test it manually:
+
+/usr/local/bin/ttyd -p 7681 bash
+
+Open a browser and go to:
+
+http://<device-ip>:7681
+
+Stop the test session with Ctrl+C in SSH.
+
+Create a systemd service file:
+
+sudo nano /etc/systemd/system/ttyd.service
+
+Paste this into the file:
+
+[Unit]
+Description=ttyd Web Terminal
+After=network.target
+
+[Service]
+Type=simple
+User=<user>
+WorkingDirectory=/home/<user>
+ExecStart=/usr/local/bin/ttyd -p 7681 -W bash
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+
+Save the file and exit nano.
+
+Reload systemd:
+
+sudo systemctl daemon-reload
+
+Enable the service at boot:
+
+sudo systemctl enable ttyd
+
+Start the service now:
+
+sudo systemctl start ttyd
+
+Check status:
+
+sudo systemctl status ttyd
+
+Open the browser again at:
+
+http://<device-ip>:7681
+
+If the terminal opens read-only, edit the service:
+
+sudo nano /etc/systemd/system/ttyd.service
+
+Change the ExecStart line to:
+
+ExecStart=/usr/local/bin/ttyd -p 7681 -W login
+
+Save the file and exit nano.
+
+Reload systemd again:
+
+sudo systemctl daemon-reload
+
+Restart ttyd:
+
+sudo systemctl restart ttyd
+
+If you want it to open directly as <user> every time, edit the service again:
+
+sudo nano /etc/systemd/system/ttyd.service
+
+Replace the service contents with:
+
+[Unit]
+Description=ttyd Web Terminal
+After=network.target
+
+[Service]
+Type=simple
+User=<user>
+WorkingDirectory=/home/<user>
+ExecStart=/usr/local/bin/ttyd -p 7681 -W /bin/bash
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+
+Save and exit.
+
+Reload and restart:
+
+sudo systemctl daemon-reload
+sudo systemctl restart ttyd
+
+Verify it is enabled:
+
+sudo systemctl is-enabled ttyd
+
+Verify it survives reboot:
+
+sudo reboot
+
+After reboot, open:
+
+http://<device-ip>:7681
